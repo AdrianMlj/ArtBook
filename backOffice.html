@@ -4,27 +4,27 @@
 <script>
     function getAnalyticsReport() {
         // Check if CONFIG is defined before proceeding
-        if (!window.CONFIG) {
-            console.error("CONFIG is not defined.");
+        if (!window.CONFIG || !window.CONFIG.PROPERTY_ID) {
+            console.error("CONFIG or PROPERTY_ID is not defined.");
             return;
         }
 
+        // Request data from Google Analytics API
         fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${window.CONFIG.PROPERTY_ID}:runReport`, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${window.CONFIG.ACCESS_TOKEN}`, // Use access token directly
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 dateRanges: [
                     {
-                        startDate: "7daysAgo", // Date range for the report
+                        startDate: "7daysAgo",  // Date range for the report
                         endDate: "today"
                     }
                 ],
                 metrics: [
                     {
-                        name: "activeUsers" // Metric you want to retrieve (e.g., active users)
+                        name: "activeUsers"  // Metric you want to retrieve (e.g., active users)
                     }
                 ]
             })
@@ -32,10 +32,10 @@
         .then(response => response.json())  // Parse the response as JSON
         .then(data => {
             console.log("Analytics Data:", data); // Log the data to the console
-            let activeUsers = data.rows[0].metricValues[0].value;
-            document.getElementById("user-count").innerText = `Active Users: ${activeUsers}`; // Display active users count
+            let activeUsers = data.rows[0].metricValues[0].value;  // Extract the active users count
+            document.getElementById("user-count").innerText = `Active Users: ${activeUsers}`;  // Display active users count
         })
-        .catch(error => console.error("Error fetching data from API:", error)); // Handle errors
+        .catch(error => console.error("Error fetching data from API:", error));  // Handle errors
     }
 
     // Call the function to get the data when the page loads
