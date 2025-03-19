@@ -1,10 +1,9 @@
-<!-- Ensure config.js is loaded first -->
+<!-- Load config.js first -->
 <script src="config.js"></script>
 
 <script>
-    // Function to fetch Google Analytics Data using the provided access token
     function getAnalyticsReport() {
-        // Ensure CONFIG is available before making the API call
+        // Check if CONFIG is defined before proceeding
         if (!window.CONFIG) {
             console.error("CONFIG is not defined.");
             return;
@@ -13,7 +12,7 @@
         fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${window.CONFIG.PROPERTY_ID}:runReport`, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${window.CONFIG.ACCESS_TOKEN}`, // Use the access token directly
+                "Authorization": `Bearer ${window.CONFIG.ACCESS_TOKEN}`, // Use access token directly
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
