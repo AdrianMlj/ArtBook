@@ -1,54 +1,34 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <script type="text/javascript">
-        var _iub = _iub || [];
-        _iub.csConfiguration = {"siteId":3968243,"cookiePolicyId":49325135,"lang":"en","storage":{"useSiteId":true}};
-        </script>
-        <script type="text/javascript" src="https://cs.iubenda.com/autoblocking/3968243.js"></script>
-        <script type="text/javascript" src="//cdn.iubenda.com/cs/gpp/stub.js"></script>
-        <script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7LGXNG8MZK"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-7LGXNG8MZK');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chargement...</title>
+    <title>Liste des Articles</title>
     <script>
-        function getQueryParams() {
-            let params = new URLSearchParams(window.location.search);
-            return {
-                titre: params.get("titre") || "Aucun titre",
-                description: params.get("description") || "Pas de description",
-                contenu: params.get("contenu") || "Pas de contenu"
-            };
+        document.addEventListener("DOMContentLoaded", function () {         
+            afficherArticles();
+        });
+        function afficherArticles() {
+            let articles = JSON.parse(localStorage.getItem("articles")) || [];
+            let liste = document.getElementById("listeArticles");
+            liste.innerHTML = "";
+
+            articles.forEach((article) => {
+                let li = document.createElement("li");
+                let lien = document.createElement("a");
+
+                lien.href = `article.html?slug=${article.slug}`;
+                lien.textContent = article.titre;
+
+                li.appendChild(lien);
+                liste.appendChild(li);
+            });
         }
-
-        function displayContent() {
-            let data = getQueryParams();
-            document.title = data.titre; // Mettre à jour la balise <title>
-            document.getElementById("titre").textContent = data.titre;
-            document.getElementById("description").textContent = data.description;
-            document.getElementById("contenu").textContent = data.contenu;
-
-            // Générer une URL propre basée sur le titre
-            let slug = data.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-            history.replaceState(null, data.titre, `${slug}.html`);
-        }
-
-        window.onload = displayContent;
     </script>
 </head>
 <body>
-    <h1 id="titre">Titre en cours de chargement...</h1>
-    <p><strong>Description :</strong> <span id="description"></span></p>
-    <p><strong>Contenu :</strong> <span id="contenu"></span></p>
+    <h1>Liste des Articles</h1>
+    <ul id="listeArticles"></ul>
 </body>
 </html>
  
