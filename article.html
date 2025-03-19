@@ -42,7 +42,22 @@
             // Modifier l'URL pour une URL propre
             history.replaceState(null, article.titre, `${article.slug}.html`);
         }
+        function afficherArticles() {
+            let articles = JSON.parse(localStorage.getItem("articles")) || [];
+            let liste = document.getElementById("listeArticles");
+            liste.innerHTML = "";
 
+            articles.forEach((article) => {
+                let li = document.createElement("li");
+                let lien = document.createElement("a");
+
+                lien.href = `article.html?slug=${article.slug}`;
+                lien.textContent = article.titre;
+
+                li.appendChild(lien);
+                liste.appendChild(li);
+            });
+        }
         window.onload = getArticle;
     </script>
 </head>

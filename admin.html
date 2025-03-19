@@ -60,6 +60,27 @@
             });
         });
 
+        function getArticle() {
+            let params = new URLSearchParams(window.location.search);
+            let slug = params.get("slug");
+
+            let articles = JSON.parse(localStorage.getItem("articles")) || [];
+
+            let article = articles.find(a => a.slug === slug);
+
+            if (!article) {
+                document.body.innerHTML = "<h2>Article non trouvé</h2><a href='index.html'>Retour</a>";
+                return;
+            }
+
+            document.title = article.titre; // Modifier le titre de la page
+            document.getElementById("titre").textContent = article.titre;
+            document.getElementById("description").textContent = article.description;
+            document.getElementById("contenu").textContent = article.contenu;
+
+            // Modifier l'URL pour une URL propre
+            history.replaceState(null, article.titre, `${article.slug}.html`);
+        }
         function afficherArticles() {
             let articles = JSON.parse(localStorage.getItem("articles")) || [];
             let liste = document.getElementById("listeArticles");
@@ -76,6 +97,7 @@
                 liste.appendChild(li);
             });
         }
+        window.onload = getArticle;
     </script>
 </head>
 <body>
