@@ -4,18 +4,20 @@
 <script>
     let accessToken = "";
 
+    // Initialize Google OAuth Client
     function initGoogleAuth() {
         google.accounts.oauth2.initTokenClient({
             client_id: CONFIG.CLIENT_ID,
-            scope: "https://www.googleapis.com/auth/analytics.readonly",
+            scope: "https://www.googleapis.com/auth/analytics.readonly", // Required scope for analytics data
             callback: (tokenResponse) => {
-                accessToken = tokenResponse.access_token;
-                console.log("Connexion réussie !");
-                getAnalyticsReport();
+                accessToken = tokenResponse.access_token; // Store the access token
+                console.log("Google Auth Success!");
+                getAnalyticsReport(); // Fetch Analytics data after authentication
             }
         }).requestAccessToken();
     }
 
+    // Get Analytics Report
     function getAnalyticsReport() {
         fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${CONFIG.PROPERTY_ID}:runReport`, {
             method: "POST",
@@ -24,18 +26,34 @@
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "dateRanges": [{ "startDate": "7daysAgo", "endDate": "today" }],
-                "metrics": [{ "name": "activeUsers" }]
+                dateRanges: [
+                    {
+                        startDate: "7daysAgo",
+                        endDate: "today"
+                    }
+                ],
+                metrics: [
+                    {
+                        name: "activeUsers" // Metric for active users
+                    }
+                ],
+                dimensions: [
+                    {
+                        name: "date" // Optional: Add dimension like date for daily data
+                    }
+                ]
             })
         })
         .then(response => response.json())
         .then(data => {
-            let users = data.rows[0].metricValues[0].value;
-            document.getElementById("user-count").innerText = `Utilisateurs actifs : ${users}`;
+            console.log("Analytics Data:", data); // Log the data for debugging
+            let activeUsers = data.rows[0].metricValues[0].value;
+            document.getElementById("user-count").innerText = `Active Users: ${activeUsers}`; // Display result
         })
-        .catch(error => console.error("Erreur API :", error));
+        .catch(error => console.error("Error fetching data from API:", error));
     }
 </script>
 
-<button onclick="initGoogleAuth()">Se connecter à Google</button>
-<p id="user-count">Chargement...</p>
+<!-- HTML to trigger the authentication and display the result -->
+<button onclick="initGoogleAuth()">Connect with Google</button>
+<p id="user-count">Loading...</p>
