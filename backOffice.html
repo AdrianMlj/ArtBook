@@ -1,0 +1,41 @@
+<script async defer src="https://accounts.google.com/gsi/client" onload="initGoogleAuth()"></script>
+<script src="config.js"></script> <!-- Import config.js first -->
+
+<script>
+    let accessToken = "";
+
+    function initGoogleAuth() {
+        google.accounts.oauth2.initTokenClient({
+            client_id: CONFIG.CLIENT_ID,
+            scope: "https://www.googleapis.com/auth/analytics.readonly",
+            callback: (tokenResponse) => {
+                accessToken = tokenResponse.access_token;
+                console.log("Connexion réussie !");
+                getAnalyticsReport();
+            }
+        }).requestAccessToken();
+    }
+
+    function getAnalyticsReport() {
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${CONFIG.PROPERTY_ID}:runReport`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "dateRanges": [{ "startDate": "7daysAgo", "endDate": "today" }],
+                "metrics": [{ "name": "activeUsers" }]
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            let users = data.rows[0].metricValues[0].value;
+            document.getElementById("user-count").innerText = `Utilisateurs actifs : ${users}`;
+        })
+        .catch(error => console.error("Erreur API :", error));
+    }
+</script>
+
+<button onclick="initGoogleAuth()">Se connecter à Google</button>
+<p id="user-count">Chargement...</p>
