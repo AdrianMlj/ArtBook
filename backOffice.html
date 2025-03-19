@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Analytics Data</title>
+</head>
+<body>
+
+<button onclick="initGoogleAuth()">Se connecter à Google</button>
+<p id="user-count">Chargement...</p>
+
+<script>
+// Fetch the config JSON file
+fetch('config.json')
+    .then(response => response.json())
+    .then(config => {
+        // Store the API key and Property ID from the config
+        const googleApiKey = config.google_api_key;
+        const googlePropertyId = config.google_property_id;
+        
+        console.log("Google API Key: " + googleApiKey);
+        console.log("Google Property ID: " + googlePropertyId);
+        
+        // Store the config globally for use in your authentication and API request
+        window.CONFIG = config;
+    })
+    .catch(error => {
+        console.error('Error fetching the config.json:', error);
+    });
+
+// Function to handle Google authentication
+let accessToken = "";
+
+function initGoogleAuth() {
+    if (window.CONFIG && window.CONFIG.google_api_key) {
+        google.accounts.oauth2.initTokenClient({
+            client_id: window.CONFIG.google_api_key,
+            scope: "https://www.googleapis.com/auth/analytics.readonly",
+            callback: (tokenResponse) => {
+                accessToken = tokenResponse.access_token;
+                console.log("Connexion réussie !");
+                getAnalyticsReport();
+            }
+        }).requestAccessToken();
+    } else {
+        console.error("Google API Key is not defined.");
+    }
+}
+
+// Function to fetch Google Analytics data
+function getAnalyticsReport() {
+    if (!accessToken) {
+        console.error("No access token available.");
+        return;
+    }
+
+    fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${window.CONFIG.google_property_id}:runReport`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "dateRanges": [{ "startDate": "7daysAgo", "endDate": "today" }],
+            "metrics": [{ "name": "activeUsers" }]
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        let users = data.rows[0].metricValues[0].value;
+        document.getElementById("user-count").innerText = `Utilisateurs actifs : ${users}`;
+    })
+    .catch(error => console.error("Erreur API :", error));
+}
+</script>
+
+</body>
+</html>
