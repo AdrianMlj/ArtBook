@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Articles</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            afficherArticles();
+
+            document.getElementById("articleForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                let titre = document.getElementById("titre").value.trim();
+                let description = document.getElementById("description").value.trim();
+                let contenu = document.getElementById("contenu").value.trim();
+
+                if (!titre || !description) {
+                    alert("Le titre et la description sont obligatoires !");
+                    return;
+                }
+
+                let articles = JSON.parse(localStorage.getItem("articles")) || [];
+
+                // Génération d'un ID unique
+                let id = Date.now();
+
+                // Création d'un slug SEO-friendly
+                let slugTitre = titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+                let slugDescription = description.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+                let slug = `${slugTitre}-${slugDescription}-${id}`;
+
+                // Ajouter l'article
+                articles.push({ id, titre, description, contenu, slug });
+
+                // Sauvegarde dans localStorage
+                localStorage.setItem("articles", JSON.stringify(articles));
+
+                // Réinitialiser le formulaire
+                document.getElementById("articleForm").reset();
+
+                // Rafraîchir la liste
+                afficherArticles();
+            });
+        });
+
+        function afficherArticles() {
+            let articles = JSON.parse(localStorage.getItem("articles")) || [];
+            let liste = document.getElementById("listeArticles");
+            liste.innerHTML = "";
+
+            articles.forEach((article) => {
+                let li = document.createElement("li");
+                let lien = document.createElement("a");
+
+                lien.href = `article.html?slug=${article.slug}`;
+                lien.textContent = article.titre;
+
+                li.appendChild(lien);
+                liste.appendChild(li);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>Ajouter un article</h2>
+    <form id="articleForm">
+        <p>Titre : <input type="text" id="titre"></p>
+        <p>Description : <input type="text" id="description"></p>
+        <p>Contenu : <input type="text" id="contenu"></p>
+        <input type="submit" value="Ajouter">
+    </form>
+
+    <h2>Liste des Articles</h2>
+    <ul id="listeArticles"></ul>
+</body>
+</html>
