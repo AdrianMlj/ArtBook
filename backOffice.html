@@ -1,59 +1,47 @@
-<script async defer src="https://accounts.google.com/gsi/client" onload="initGoogleAuth()"></script>
-<script src="config.js"></script> <!-- Import config.js first -->
+<!-- Ensure config.js is loaded first -->
+<script src="config.js"></script>
 
 <script>
-    let accessToken = "";
-
-    // Initialize Google OAuth Client
-    function initGoogleAuth() {
-        google.accounts.oauth2.initTokenClient({
-            client_id: CONFIG.CLIENT_ID,
-            scope: "https://www.googleapis.com/auth/analytics.readonly", // Required scope for analytics data
-            callback: (tokenResponse) => {
-                accessToken = tokenResponse.access_token; // Store the access token
-                console.log("Google Auth Success!");
-                getAnalyticsReport(); // Fetch Analytics data after authentication
-            }
-        }).requestAccessToken();
-    }
-
-    // Get Analytics Report
+    // Function to fetch Google Analytics Data using the provided access token
     function getAnalyticsReport() {
-        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${CONFIG.PROPERTY_ID}:runReport`, {
+        // Ensure CONFIG is available before making the API call
+        if (!window.CONFIG) {
+            console.error("CONFIG is not defined.");
+            return;
+        }
+
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${window.CONFIG.PROPERTY_ID}:runReport`, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${accessToken}`,
+                "Authorization": `Bearer ${window.CONFIG.ACCESS_TOKEN}`, // Use the access token directly
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 dateRanges: [
                     {
-                        startDate: "7daysAgo",
+                        startDate: "7daysAgo", // Date range for the report
                         endDate: "today"
                     }
                 ],
                 metrics: [
                     {
-                        name: "activeUsers" // Metric for active users
-                    }
-                ],
-                dimensions: [
-                    {
-                        name: "date" // Optional: Add dimension like date for daily data
+                        name: "activeUsers" // Metric you want to retrieve (e.g., active users)
                     }
                 ]
             })
         })
-        .then(response => response.json())
+        .then(response => response.json())  // Parse the response as JSON
         .then(data => {
-            console.log("Analytics Data:", data); // Log the data for debugging
+            console.log("Analytics Data:", data); // Log the data to the console
             let activeUsers = data.rows[0].metricValues[0].value;
-            document.getElementById("user-count").innerText = `Active Users: ${activeUsers}`; // Display result
+            document.getElementById("user-count").innerText = `Active Users: ${activeUsers}`; // Display active users count
         })
-        .catch(error => console.error("Error fetching data from API:", error));
+        .catch(error => console.error("Error fetching data from API:", error)); // Handle errors
     }
+
+    // Call the function to get the data when the page loads
+    getAnalyticsReport();
 </script>
 
-<!-- HTML to trigger the authentication and display the result -->
-<button onclick="initGoogleAuth()">Connect with Google</button>
+<!-- HTML to display the result -->
 <p id="user-count">Loading...</p>
