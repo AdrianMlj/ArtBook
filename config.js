@@ -1,7 +1,7 @@
 // config.js
 const CONFIG = {
-    PROPERTY_ID: process.env.NEXT_PUBLIC_GOOGLE_PROPERTY_ID,   // Vercel environment variable for property ID
+    PROPERTY_ID: process.env.NEXT_PUBLIC_GOOGLE_PROPERTY_ID,  // Accessing Vercel environment variable
 };
 
-// Make CONFIG globally available for use
+// Making CONFIG globally available
 window.CONFIG = CONFIG;
