@@ -10,6 +10,9 @@
 <button onclick="initGoogleAuth()">Se connecter à Google</button>
 <p id="user-count">Chargement...</p>
 
+<!-- Load the Google API Client Library -->
+<script async defer src="https://accounts.google.com/gsi/client"></script>
+
 <script>
 // Fetch the config JSON file
 fetch('config.json')
