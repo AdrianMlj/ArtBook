@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("loginForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                
+                let username = document.getElementById("username").value.trim();
+                let password = document.getElementById("password").value.trim();
+                
+                // Simuler une base de données avec des utilisateurs
+                let users = {
+                    "admin": { password: "admin123", role: "admin" },
+                    "user": { password: "user123", role: "user" }
+                };
+                
+                if (users[username] && users[username].password === password) {
+                    alert("Connexion réussie en tant que " + users[username].role);
+                    
+                    if (users[username].role === "admin") {
+                        window.location.href = "admin.html";
+                    } else {
+                        window.location.href = "user.html";
+                    }
+                } else {
+                    alert("Identifiants incorrects");
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2>Connexion</h2>
+    <form id="loginForm">
+        <p>Nom d'utilisateur : <input type="text" id="username" required></p>
+        <p>Mot de passe : <input type="password" id="password" required></p>
+        <input type="submit" value="Se connecter">
+    </form>
+</body>
+</html>
